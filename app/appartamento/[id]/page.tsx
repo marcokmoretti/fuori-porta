@@ -12,25 +12,66 @@ export default async function DettaglioAppartamento({ params }: { params: Promis
 
   if (error || !appartamento) return <p>Appartamento non trovato</p>
 
-  async function prenota(formData: FormData) {
-    'use server'
-    
-    const nome = formData.get('nome') as string
-    const email = formData.get('email') as string
-    const check_in = formData.get('check_in') as string
-    const check_out = formData.get('check_out') as string
+async function prenota(formData: FormData) {
+  'use server'
 
-    await supabase.from('prenotazioni').insert({
-      appartamento_id: Number(id),
-      nome_ospite: nome,
-      email_ospite: email,
-      check_in,
-      check_out,
-      stato: 'confermata'
-    })
+  const nome = formData.get('nome') as string
+  const email = formData.get('email') as string
+  const check_in = formData.get('check_in') as string
+  const check_out = formData.get('check_out') as string
 
-    redirect('/prenotazione-confermata')
+  // Controlla sovrapposizioni
+  const { data: sovrapposizioni } = await supabase
+    .from('prenotazioni')
+    .select('id')
+    .eq('appartamento_id', Number(id))
+    .lt('check_in', check_out)
+    .gt('check_out', check_in)
+
+// Controlla che check_out sia dopo check_in
+if (check_out <= check_in) {
+  redirect('/date-non-valide')
+}
+
+
+  if (sovrapposizioni && sovrapposizioni.length > 0) {
+    redirect('/date-non-disponibili')
   }
+
+  await supabase.from('prenotazioni').insert({
+    appartamento_id: Number(id),
+    nome_ospite: nome,
+    email_ospite: email,
+    check_in,
+    check_out,
+    stato: 'confermata'
+  })
+
+  redirect('/prenotazione-confermata')
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   return (
     <main style={{ padding: '40px', fontFamily: 'sans-serif', maxWidth: '600px' }}>
