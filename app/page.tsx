@@ -21,7 +21,6 @@ export default async function Home() {
          <Link href={`/appartamento/${a.id}`} style={{ color: '#2D4A35', fontWeight: 'bold' }}>
             Vedi dettagli →
           </Link>
-        
         </div>
       ))}
     </main>
