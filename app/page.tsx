@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 import { supabase } from './supabase'
 
 export default async function Home() {
@@ -16,6 +18,10 @@ export default async function Home() {
           <h2>{a.nome}</h2>
           <p>{a.descrizione}</p>
           <p><strong>€ {a.prezzo} / notte</strong> · {a.metri_quadri} m² · {a.max_ospiti} ospiti max</p>
+         <Link href={`/appartamento/${a.id}`} style={{ color: '#2D4A35', fontWeight: 'bold' }}>
+            Vedi dettagli →
+          </Link>
+        
         </div>
       ))}
     </main>
